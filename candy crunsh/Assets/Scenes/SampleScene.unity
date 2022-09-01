@@ -152,10 +152,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ecabbde8f623a409cf0edfc5435740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alto: 15
-  ancho: 20
+  alto: 2
+  ancho: 2
   preFile: {fileID: 6972442591713200693, guid: 0c1f7677883d8cb44af16ba4d433860a, type: 3}
-  cam: {fileID: 0}
+  cam: {fileID: 519420031}
+  borde: 1
+  goPrefabs:
+  - {fileID: 8084016062173191951, guid: 282774522df13f043baa78acc9ce9a41, type: 3}
+  - {fileID: 884250108359273278, guid: 05ab3fbef6d9c44458338a003a4a031a, type: 3}
+  - {fileID: 1232721914164295501, guid: d7e86b4932511284cbc85037466eb376, type: 3}
+  - {fileID: 4090415913832588363, guid: 18cbc0eef71068b4682cc0ba6c2c45c5, type: 3}
+  - {fileID: 6477772752665558814, guid: 470ce9ea5b6c6514a9f52d7ee7e9c1f8, type: 3}
+  - {fileID: 6923857993116029308, guid: 6f2b6ef3f8e0b9c41bba7622b89ac51b, type: 3}
+  - {fileID: 7600906682615681780, guid: 160303c95893239449a65fb9629c8fe6, type: 3}
+  - {fileID: 7373547007629155520, guid: 4ed883786bbff9e4facf7411ec67a925, type: 3}
+  - {fileID: 3695229829392138749, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
 --- !u!4 &342645402
 Transform:
   m_ObjectHideFlags: 0
@@ -223,7 +234,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7.93
+  orthographic size: 8.72
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -247,7 +258,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
