@@ -152,8 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ecabbde8f623a409cf0edfc5435740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alto: 2
-  ancho: 2
+  alto: 5
+  ancho: 5
   preFile: {fileID: 6972442591713200693, guid: 0c1f7677883d8cb44af16ba4d433860a, type: 3}
   cam: {fileID: 519420031}
   borde: 1
@@ -167,6 +167,8 @@ MonoBehaviour:
   - {fileID: 7600906682615681780, guid: 160303c95893239449a65fb9629c8fe6, type: 3}
   - {fileID: 7373547007629155520, guid: 4ed883786bbff9e4facf7411ec67a925, type: 3}
   - {fileID: 3695229829392138749, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
+  initialPiece: {fileID: 0}
+  endPiece: {fileID: 0}
 --- !u!4 &342645402
 Transform:
   m_ObjectHideFlags: 0

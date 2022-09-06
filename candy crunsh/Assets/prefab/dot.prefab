@@ -97,7 +97,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coordenadaX: 0
   coordenadaY: 0
-  tipoMovimiento: 0
+  tipoMovimiento: 2
+  tipoFicha: 8
   yaSeEjecuto: 1
   timeMovement: 2
   curve:
@@ -133,3 +134,4 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  board: {fileID: 0}

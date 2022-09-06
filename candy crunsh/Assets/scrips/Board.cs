@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Board : MonoBehaviour
 {
@@ -13,34 +14,34 @@ public class Board : MonoBehaviour
     public int borde;
     public GameObject[] goPrefabs = new GameObject[2];
 
-    public Tile inicial;
-    public Tile final;
+    public Tile initialPiece;
+    public Tile endPiece;
 
     private void Start()
     {
+        piezas = new Piezas[ancho, alto];
         CrearBoard();
         OrganizarCamara();
-        LlenarMatriz();
+        LlenarMatriz();   
     }
-
     void CrearBoard()
     {
-        board = new Tile[alto, ancho];
+        board = new Tile[ancho, alto];
 
-        for (int i = 0; i < alto; i++)
+        for (int x = 0; x < ancho; x++)
         {
-            for (int j = 0; j < ancho; j++)
+            for (int y = 0; y < alto; y++)
             {
                 GameObject go = Instantiate(preFile);
-                go.name = "Tile" + i + "," + j;
-                go.transform.position = new Vector3(j, i, 0);
+                go.name = "Tile" + x + "," + y;
+                go.transform.position = new Vector3(x, y, 0);
                 go.transform.parent = transform;
 
                 //cam.transform.position = new Vector3(i, j, -10)/2;
                 Tile tile = go.GetComponent<Tile>();
                 tile.board = this;
-                board[i, j] = tile;
-                tile.Iniciar(i,j);
+                board[x, y] = tile;
+                tile.Iniciar(x,y);
             }
         }
 
@@ -66,45 +67,181 @@ public class Board : MonoBehaviour
     {
         int numeroR = Random.Range(0, goPrefabs.Length);
         GameObject go = Instantiate(goPrefabs[numeroR]);
+        go.GetComponent<Piezas>().board = this;
         return go;
 }
-    void PiezaPosicion( Piezas gp,int x, int y)
+   public  void PiezaPosicion( Piezas gp,int x, int y)
     {
         gp.transform.position = new Vector2(x, y);
         gp.Coordenada(x, y);
+        piezas[x, y] = gp;
+
+
     }
 
     void LlenarMatriz()
     {
 
-        for (int i = 0; i < ancho; i++)
+        for (int x = 0; x < ancho; x++)
         {
-            for (int j = 0; j < alto; j++)
+            for (int y = 0; y < alto; y++)
             {
                 GameObject go = PiezaAleatoria();
-                PiezaPosicion(go.GetComponent<Piezas>(),i,j);
+                PiezaPosicion(go.GetComponent<Piezas>(),x,y);
             }
         }
         
     }
-
     public void SetInitialTile(Tile ini)
     {
-        if (inicial == null)
+        if (initialPiece == null)
         {
-            inicial = ini;
+            initialPiece = ini;
         }
     }
     public void SetEndTile(Tile fin)
     {
-        if (inicial != null)
+        if (initialPiece != null && vecino(initialPiece, fin) == true)
         {
-            final = fin;
+            endPiece = fin;
         }
     }
     public void Relase()
     {
-        inicial = null;
-        final = null;
+        if (initialPiece!= null && endPiece != null)
+        {
+            CambioPiezas(initialPiece, endPiece);
+        }
+        initialPiece = null;
+        endPiece = null;
+    }
+    void CambioPiezas(Tile initi, Tile end)
+    {
+        Piezas GpIn = piezas[initi.indiceX, initi.indiceY];
+        Piezas GpEnd = piezas[end.indiceX, end.indiceY];
+
+        GpIn.Coordenada(end.indiceX, end.indiceY);
+        GpEnd.Coordenada(initi.indiceX, initi.indiceY);
+
+        GpIn.Moverpieza(end.indiceX, end.indiceY, 0.5f);
+        GpEnd.Moverpieza(initi.indiceX, initi.indiceY, 0.5f);
+    }
+
+    bool vecino(Tile ini, Tile fin)
+    {
+
+        if (Mathf.Abs(ini.indiceX - fin.indiceX) == 1 && ini.indiceY == fin.indiceY)
+        {
+            Debug.Log("true");
+            return true;
+        }
+        else
+        {
+            if (Mathf.Abs(ini.indiceY - fin.indiceY) == 1 && ini.indiceX == fin.indiceX)
+            {
+               Debug.Log("true");
+               return true;
+            }
+            else
+            {
+               Debug.Log("false");
+               return false;
+            }
+        }
+    }
+
+    bool EstaEnRango(int _x, int _y)
+    {
+        return (_x < ancho && _x >= 0 && _y < alto && _y >= alto);
+    }
+
+    List<Piezas> EncontrarCoincidencias(int starX, int starY, Vector2 direccionDeBusqueda, int cantidadMinima = 3)
+    {
+        // lista de coincidencias encontradas
+        List<Piezas> coincidencias = new List<Piezas>();
+
+        // referencia a gamepiece inicial
+        Piezas piezaInicial = null;
+
+        if (EstaEnRango(starX, starY))
+        {
+            piezaInicial = piezas[starX, starY];
+        }
+        if (piezaInicial != null)
+        {
+            coincidencias.Add(piezaInicial);
+        }
+        else
+        {
+            return null;
+        }
+
+        int siguienteX;
+        int siguienteY;
+
+        int valorMaximo = ancho > alto ? ancho : alto;
+
+        for (int i = 0; i < valorMaximo -1; i++)
+        {
+            siguienteX = starX + (int)Mathf.Clamp(direccionDeBusqueda.x, -1, 1) * i;
+            siguienteY = starY + (int)Mathf.Clamp(direccionDeBusqueda.x, -1, 1) * i;
+
+            if (!EstaEnRango(siguienteX, siguienteY))
+            {
+                break;
+            }
+            Piezas siguientepieza = piezas[siguienteX, siguienteY];
+
+            //comparar si piezas inicila y fianl si son del mismo tipo
+            if (piezaInicial.tipoFicha == siguientepieza.tipoFicha && !coincidencias.Contains(siguientepieza))
+            {
+                coincidencias.Add(siguientepieza);
+            }
+            else
+            {
+                break;
+            }
+
+        }
+        if (coincidencias.Count >= cantidadMinima)
+        {
+            return coincidencias;
+        }
+        return null;
+    }
+
+    List<Piezas> BusquedaVertical(int startX,int startY, int cantidadMinima=3)
+    {
+        List<Piezas> arriba = EncontrarCoincidencias(startX, startY, Vector2.up, 2);
+        List<Piezas> abajo = EncontrarCoincidencias(startX, startY, Vector2.down, 2);
+
+        if (arriba == null)
+        {
+            arriba = new List<Piezas>();
+        }
+        if (abajo == null)
+        {
+            abajo = new List<Piezas>();
+        }
+        var listasCombinadas = arriba.Union(abajo).ToList();
+
+        return listasCombinadas.Count>=cantidadMinima ? listasCombinadas : null;
+    }
+    List<Piezas> BusquedaHoriizontal(int startX, int startY, int cantidadMinima = 3)
+    {
+        List<Piezas> derecha = EncontrarCoincidencias(startX, startY, Vector2.right, 2);
+        List<Piezas> izquierda = EncontrarCoincidencias(startX, startY, Vector2.left, 2);
+
+        if (izquierda == null)
+        {
+            izquierda = new List<Piezas>();
+        }
+        if (derecha == null)
+        {
+            derecha = new List<Piezas>();
+        }
+        var listasCombinadas = izquierda.Union(derecha).ToList();
+
+        return listasCombinadas.Count >= cantidadMinima ? listasCombinadas : null;
     }
 }

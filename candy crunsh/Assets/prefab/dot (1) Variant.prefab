@@ -7,6 +7,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 778808081003675037, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
+      propertyPath: tipoMovimiento
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 778808081003675037, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
+      propertyPath: curve.m_Curve.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3695229829392138746, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
       propertyPath: m_Color.b
       value: 0

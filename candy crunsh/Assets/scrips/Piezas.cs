@@ -8,6 +8,7 @@ public class Piezas : MonoBehaviour
     public int coordenadaY;
 
     public TipoMovimiento tipoMovimiento;
+    public TipoFicha tipoFicha;
 
     public bool yaSeEjecuto = true;
 
@@ -15,9 +16,11 @@ public class Piezas : MonoBehaviour
 
     public AnimationCurve curve;
 
+    public Board board;
+
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        /*if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             Moverpieza(new Vector3((int)transform.position.x, (int)transform.position.y + 1, 0), timeMovement);
         }
@@ -35,20 +38,20 @@ public class Piezas : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             Moverpieza(new Vector3((int)transform.position.x, (int)transform.position.y - 1, 0), timeMovement);
-        }
+        }*/
     }
     public void Coordenada(int cambioX, int cambioY)
     {
         coordenadaX = cambioX;
         coordenadaY = cambioY;
     }
-    void Moverpieza(Vector3 endPosition, float timeMovement)
-    {
+   public void Moverpieza(int x, int y, float timeMovement)
+   {
         if (yaSeEjecuto == true)
         {
-            StartCoroutine(MovePiece(endPosition, timeMovement));
+            StartCoroutine(MovePiece(new Vector3(x,y,0), timeMovement));
         }
-    }
+   }
     IEnumerator MovePiece(Vector3 endPosition, float timeMovement)
     {
         yaSeEjecuto = false;
@@ -63,6 +66,7 @@ public class Piezas : MonoBehaviour
                 llegoAlPunto = true;
                 yaSeEjecuto = true;
                 transform.position = new Vector3((int)endPosition.x, (int)endPosition.y);
+                board.PiezaPosicion(this,(int)endPosition.x ,(int)endPosition.y);
                 break;
             }
 
@@ -92,7 +96,6 @@ public class Piezas : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
     }
-
     public enum TipoMovimiento
     {
         lineal,
@@ -100,5 +103,18 @@ public class Piezas : MonoBehaviour
         suavizado,
         salida,
         MasSuavizado,
+    }
+
+    public enum TipoFicha
+    {
+        verde,
+        azul_marino,
+        azul_oscuro,
+        rosado,
+        morado,
+        verde_oscuro,
+        beich,
+        rojo,
+        blanco,
     }
 }
