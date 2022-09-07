@@ -22,7 +22,8 @@ public class Board : MonoBehaviour
         piezas = new Piezas[ancho, alto];
         CrearBoard();
         OrganizarCamara();
-        LlenarMatriz();   
+        LlenarMatriz();
+        ResaltarCoincidencia();
     }
     void CrearBoard()
     {
@@ -132,19 +133,16 @@ public class Board : MonoBehaviour
 
         if (Mathf.Abs(ini.indiceX - fin.indiceX) == 1 && ini.indiceY == fin.indiceY)
         {
-            Debug.Log("true");
             return true;
         }
         else
         {
             if (Mathf.Abs(ini.indiceY - fin.indiceY) == 1 && ini.indiceX == fin.indiceX)
             {
-               Debug.Log("true");
                return true;
             }
             else
             {
-               Debug.Log("false");
                return false;
             }
         }
@@ -154,7 +152,6 @@ public class Board : MonoBehaviour
     {
         return (_x < ancho && _x >= 0 && _y < alto && _y >= alto);
     }
-
     List<Piezas> EncontrarCoincidencias(int starX, int starY, Vector2 direccionDeBusqueda, int cantidadMinima = 3)
     {
         // lista de coincidencias encontradas
@@ -209,7 +206,6 @@ public class Board : MonoBehaviour
         }
         return null;
     }
-
     List<Piezas> BusquedaVertical(int startX,int startY, int cantidadMinima=3)
     {
         List<Piezas> arriba = EncontrarCoincidencias(startX, startY, Vector2.up, 2);
@@ -227,7 +223,7 @@ public class Board : MonoBehaviour
 
         return listasCombinadas.Count>=cantidadMinima ? listasCombinadas : null;
     }
-    List<Piezas> BusquedaHoriizontal(int startX, int startY, int cantidadMinima = 3)
+    List<Piezas> BusquedaHorizontal(int startX, int startY, int cantidadMinima = 3)
     {
         List<Piezas> derecha = EncontrarCoincidencias(startX, startY, Vector2.right, 2);
         List<Piezas> izquierda = EncontrarCoincidencias(startX, startY, Vector2.left, 2);
@@ -243,5 +239,35 @@ public class Board : MonoBehaviour
         var listasCombinadas = izquierda.Union(derecha).ToList();
 
         return listasCombinadas.Count >= cantidadMinima ? listasCombinadas : null;
+    }
+
+    void ResaltarCoincidencia()
+    {
+        for (int x = 0; x < ancho; x++)
+        {
+            for (int y = 0; y < alto; y++)
+            {
+                List<Piezas> horizontal = BusquedaHorizontal(x, y,3);
+                List<Piezas> vertical = BusquedaVertical(x, y,3);
+
+                if (horizontal == null)
+                {
+                    horizontal = new List<Piezas>();
+                }
+
+                if (vertical == null)
+                {
+                    vertical = new List<Piezas>();
+                }
+
+                var listasCombinadas = horizontal.Union(vertical).ToList();
+
+                if (listasCombinadas.Count>= 3)
+                {
+                    Debug.Log(listasCombinadas.Count);
+                }
+            }
+        }
+
     }
 }
