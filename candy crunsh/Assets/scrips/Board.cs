@@ -23,7 +23,6 @@ public class Board : MonoBehaviour
         CrearBoard();
         OrganizarCamara();
         LlenarMatriz();
-        ResaltarCoincidencia();
     }
     void CrearBoard()
     {
@@ -126,6 +125,9 @@ public class Board : MonoBehaviour
 
         GpIn.Moverpieza(end.indiceX, end.indiceY, 0.5f);
         GpEnd.Moverpieza(initi.indiceX, initi.indiceY, 0.5f);
+
+        ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
+        ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);
     }
 
     bool vecino(Tile ini, Tile fin)
@@ -150,7 +152,7 @@ public class Board : MonoBehaviour
 
     bool EstaEnRango(int _x, int _y)
     {
-        return (_x < ancho && _x >= 0 && _y < alto && _y >= alto);
+        return (_x < ancho && _x >= 0 && _y < alto && _y >= 0);
     }
     List<Piezas> EncontrarCoincidencias(int starX, int starY, Vector2 direccionDeBusqueda, int cantidadMinima = 3)
     {
@@ -178,10 +180,10 @@ public class Board : MonoBehaviour
 
         int valorMaximo = ancho > alto ? ancho : alto;
 
-        for (int i = 0; i < valorMaximo -1; i++)
+        for (int i = 1; i < valorMaximo -1; i++)
         {
             siguienteX = starX + (int)Mathf.Clamp(direccionDeBusqueda.x, -1, 1) * i;
-            siguienteY = starY + (int)Mathf.Clamp(direccionDeBusqueda.x, -1, 1) * i;
+            siguienteY = starY + (int)Mathf.Clamp(direccionDeBusqueda.y, -1, 1) * i;
 
             if (!EstaEnRango(siguienteX, siguienteY))
             {
@@ -208,8 +210,8 @@ public class Board : MonoBehaviour
     }
     List<Piezas> BusquedaVertical(int startX,int startY, int cantidadMinima=3)
     {
-        List<Piezas> arriba = EncontrarCoincidencias(startX, startY, Vector2.up, 2);
-        List<Piezas> abajo = EncontrarCoincidencias(startX, startY, Vector2.down, 2);
+        List<Piezas> arriba = EncontrarCoincidencias(startX, startY, Vector2.up, 3);
+        List<Piezas> abajo = EncontrarCoincidencias(startX, startY, Vector2.down, 3);
 
         if (arriba == null)
         {
@@ -221,12 +223,12 @@ public class Board : MonoBehaviour
         }
         var listasCombinadas = arriba.Union(abajo).ToList();
 
-        return listasCombinadas.Count>=cantidadMinima ? listasCombinadas : null;
+        return listasCombinadas.Count >= cantidadMinima ? listasCombinadas : null;
     }
     List<Piezas> BusquedaHorizontal(int startX, int startY, int cantidadMinima = 3)
     {
-        List<Piezas> derecha = EncontrarCoincidencias(startX, startY, Vector2.right, 2);
-        List<Piezas> izquierda = EncontrarCoincidencias(startX, startY, Vector2.left, 2);
+        List<Piezas> derecha = EncontrarCoincidencias(startX, startY, Vector2.right, 3);
+        List<Piezas> izquierda = EncontrarCoincidencias(startX, startY, Vector2.left, 3);
 
         if (izquierda == null)
         {
@@ -236,7 +238,7 @@ public class Board : MonoBehaviour
         {
             derecha = new List<Piezas>();
         }
-        var listasCombinadas = izquierda.Union(derecha).ToList();
+        var listasCombinadas = derecha.Union(izquierda).ToList();
 
         return listasCombinadas.Count >= cantidadMinima ? listasCombinadas : null;
     }
@@ -247,27 +249,47 @@ public class Board : MonoBehaviour
         {
             for (int y = 0; y < alto; y++)
             {
-                List<Piezas> horizontal = BusquedaHorizontal(x, y,3);
-                List<Piezas> vertical = BusquedaVertical(x, y,3);
-
-                if (horizontal == null)
-                {
-                    horizontal = new List<Piezas>();
-                }
-
-                if (vertical == null)
-                {
-                    vertical = new List<Piezas>();
-                }
-
-                var listasCombinadas = horizontal.Union(vertical).ToList();
-
-                if (listasCombinadas.Count>= 3)
-                {
-                    Debug.Log(listasCombinadas.Count);
-                }
+                ResaltarCoincidenciaEn(x, y);
             }
         }
+    }
 
+    private void ResaltarCoincidenciaEn(int x, int y)
+
+    {
+        var listasCombinadas = EncontrarCoincidenciaEn(x,y);
+
+        if (listasCombinadas.Count > 0)
+        {
+            foreach (Piezas P in listasCombinadas)
+            {
+                ResaltarTileEn(P.coordenadaX, P.coordenadaY, P.GetComponent<SpriteRenderer>().color);
+            }
+        }
+    }
+
+    private List<Piezas> EncontrarCoincidenciaEn(int x, int y)
+    {
+        List<Piezas> horizontal = BusquedaHorizontal(x, y);
+        List<Piezas> vertical = BusquedaVertical(x, y);
+
+        if (horizontal == null)
+        {
+            horizontal = new List<Piezas>();
+        }
+
+        if (vertical == null)
+        {
+            vertical = new List<Piezas>();
+        }
+
+        var listasCombinadas = horizontal.Union(vertical).ToList();
+        return listasCombinadas;
+    }
+
+    private void ResaltarTileEn(int x_, int y_, Color col_)
+    {
+        SpriteRenderer sr = board[x_, y_].GetComponent<SpriteRenderer>();
+        sr.color = col_;
     }
 }

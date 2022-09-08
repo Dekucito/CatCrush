@@ -116,6 +116,10 @@ PrefabInstance:
       value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 3695229829392138746, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3695229829392138746, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
       propertyPath: m_Color.b
       value: 1
       objectReference: {fileID: 0}
@@ -173,7 +177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3695229829392138749, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
       propertyPath: m_Name
-      value: dot (2) Variant
+      value: Azul_marino
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2755ea127f0341f4095cf1780ed147d8, type: 3}
