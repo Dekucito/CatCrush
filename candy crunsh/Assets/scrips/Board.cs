@@ -17,6 +17,9 @@ public class Board : MonoBehaviour
     public Tile initialPiece;
     public Tile endPiece;
 
+    [Range(0,.5f)]
+    public float swapTime = .3f;
+
     private void Start()
     {
         piezas = new Piezas[ancho, alto];
@@ -46,7 +49,6 @@ public class Board : MonoBehaviour
         }
 
     }
-
     void OrganizarCamara() 
     {
         cam.transform.position = new Vector3(((float)ancho / 2) - .5f, ((float)alto / 2) - .5f, -10);
@@ -62,7 +64,6 @@ public class Board : MonoBehaviour
             cam.orthographicSize = alt;
         }
     }
-
     GameObject PiezaAleatoria()
     {
         int numeroR = Random.Range(0, goPrefabs.Length);
@@ -78,19 +79,55 @@ public class Board : MonoBehaviour
 
 
     }
-
     void LlenarMatriz()
     {
+        bool estaLleno = false;
+        int interacciones = 0;
+        int interaccionesmaximas = 100;
 
         for (int x = 0; x < ancho; x++)
         {
             for (int y = 0; y < alto; y++)
             {
-                GameObject go = PiezaAleatoria();
-                PiezaPosicion(go.GetComponent<Piezas>(),x,y);
+                LlenarMatrizAleatoriaEn(x, y);
             }
         }
-        
+        while (!estaLleno)
+        {
+            List<Piezas> coincidencias = EncontrarTodasLasCoincidencias();
+            if (coincidencias.Count == 0)
+            {
+                estaLleno = true;
+                break;
+            }
+            else
+            {
+                ReemplazarConPiezaAleatoria(coincidencias);
+            }
+            if (interacciones > interaccionesmaximas)
+            {
+                estaLleno = true;
+                Debug.LogWarning("se alcanzo el numero maximo de interacciones");
+                break;
+            }
+            interacciones++;
+        }
+
+    }
+    private void ReemplazarConPiezaAleatoria(List<Piezas> coincidencias)
+    {
+        foreach (Piezas gamePiece  in coincidencias)
+        {
+            ClearPieceAt(gamePiece.coordenadaX,gamePiece.coordenadaY);
+            LlenarMatrizAleatoriaEn(gamePiece.coordenadaX,gamePiece.coordenadaY);
+        }
+    }
+
+    void LlenarMatrizAleatoriaEn(int x, int y)
+    {
+        GameObject go = PiezaAleatoria();
+        PiezaPosicion(go.GetComponent<Piezas>(), x, y);
+
     }
     public void SetInitialTile(Tile ini)
     {
@@ -117,19 +154,38 @@ public class Board : MonoBehaviour
     }
     void CambioPiezas(Tile initi, Tile end)
     {
+        StartCoroutine(SwitchCorrutine(initi,end));
+    }
+    IEnumerator SwitchCorrutine(Tile initi, Tile end)
+    {
         Piezas GpIn = piezas[initi.indiceX, initi.indiceY];
         Piezas GpEnd = piezas[end.indiceX, end.indiceY];
 
-        GpIn.Coordenada(end.indiceX, end.indiceY);
-        GpEnd.Coordenada(initi.indiceX, initi.indiceY);
+        if (GpIn != null & GpEnd != null)
+        {
+            GpIn.Moverpieza(end.indiceX, end.indiceY, swapTime);
+            GpEnd.Moverpieza(initi.indiceX, initi.indiceY, swapTime);
 
-        GpIn.Moverpieza(end.indiceX, end.indiceY, 0.5f);
-        GpEnd.Moverpieza(initi.indiceX, initi.indiceY, 0.5f);
+            yield return new WaitForSeconds(swapTime);
 
-        ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
-        ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);
+            List<Piezas> ListaPiezaInicial = EncontrarCoincidenciaEn(initi.indiceX, initi.indiceY);
+            List<Piezas> ListaPiezaFinal = EncontrarCoincidenciaEn(end.indiceX, end.indiceY);
+
+            var ListasCombiadas = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
+
+            if (ListasCombiadas.Count == 0)
+            {
+                GpIn.Moverpieza(initi.indiceX, initi.indiceY, swapTime);
+                GpEnd.Moverpieza(end.indiceX, end.indiceY, swapTime);
+            }
+            else
+            {
+                ClearPieceAt(ListasCombiadas);
+                /*ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
+                ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);*/
+            }
+        }
     }
-
     bool vecino(Tile ini, Tile fin)
     {
 
@@ -149,7 +205,6 @@ public class Board : MonoBehaviour
             }
         }
     }
-
     bool EstaEnRango(int _x, int _y)
     {
         return (_x < ancho && _x >= 0 && _y < alto && _y >= 0);
@@ -192,15 +247,22 @@ public class Board : MonoBehaviour
             Piezas siguientepieza = piezas[siguienteX, siguienteY];
 
             //comparar si piezas inicila y fianl si son del mismo tipo
-            if (piezaInicial.tipoFicha == siguientepieza.tipoFicha && !coincidencias.Contains(siguientepieza))
-            {
-                coincidencias.Add(siguientepieza);
-            }
-            else
+
+            if (siguientepieza == null)
             {
                 break;
             }
-
+            else
+            {
+                if (piezaInicial.tipoFicha == siguientepieza.tipoFicha && !coincidencias.Contains(siguientepieza))
+                {
+                    coincidencias.Add(siguientepieza);
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
         if (coincidencias.Count >= cantidadMinima)
         {
@@ -210,8 +272,8 @@ public class Board : MonoBehaviour
     }
     List<Piezas> BusquedaVertical(int startX,int startY, int cantidadMinima=3)
     {
-        List<Piezas> arriba = EncontrarCoincidencias(startX, startY, Vector2.up, 3);
-        List<Piezas> abajo = EncontrarCoincidencias(startX, startY, Vector2.down, 3);
+        List<Piezas> arriba = EncontrarCoincidencias(startX, startY, Vector2.up, 2);
+        List<Piezas> abajo = EncontrarCoincidencias(startX, startY, Vector2.down, 2);
 
         if (arriba == null)
         {
@@ -227,8 +289,8 @@ public class Board : MonoBehaviour
     }
     List<Piezas> BusquedaHorizontal(int startX, int startY, int cantidadMinima = 3)
     {
-        List<Piezas> derecha = EncontrarCoincidencias(startX, startY, Vector2.right, 3);
-        List<Piezas> izquierda = EncontrarCoincidencias(startX, startY, Vector2.left, 3);
+        List<Piezas> derecha = EncontrarCoincidencias(startX, startY, Vector2.right, 2);
+        List<Piezas> izquierda = EncontrarCoincidencias(startX, startY, Vector2.left, 2);
 
         if (izquierda == null)
         {
@@ -242,8 +304,7 @@ public class Board : MonoBehaviour
 
         return listasCombinadas.Count >= cantidadMinima ? listasCombinadas : null;
     }
-
-    void ResaltarCoincidencia()
+    void ResaltarCoincidencias()
     {
         for (int x = 0; x < ancho; x++)
         {
@@ -253,9 +314,7 @@ public class Board : MonoBehaviour
             }
         }
     }
-
     private void ResaltarCoincidenciaEn(int x, int y)
-
     {
         var listasCombinadas = EncontrarCoincidenciaEn(x,y);
 
@@ -267,7 +326,6 @@ public class Board : MonoBehaviour
             }
         }
     }
-
     private List<Piezas> EncontrarCoincidenciaEn(int x, int y)
     {
         List<Piezas> horizontal = BusquedaHorizontal(x, y);
@@ -286,10 +344,49 @@ public class Board : MonoBehaviour
         var listasCombinadas = horizontal.Union(vertical).ToList();
         return listasCombinadas;
     }
-
+    public List<Piezas> EncontrarTodasLasCoincidencias()
+    {
+        List<Piezas> todasLasCoincidencias = new List<Piezas>();
+        for (int x = 0; x < ancho; x++)
+        {
+            for (int y = 0; y < alto; y++)
+            {
+                var coincidencias = EncontrarCoincidenciaEn(x, y);
+                todasLasCoincidencias = todasLasCoincidencias.Union(coincidencias).ToList();
+            }
+        }
+        return todasLasCoincidencias;
+    }
     private void ResaltarTileEn(int x_, int y_, Color col_)
     {
         SpriteRenderer sr = board[x_, y_].GetComponent<SpriteRenderer>();
         sr.color = col_;
+    }
+    void ClearBoard()
+    {
+        for (int x = 0; x < ancho; x++)
+        {
+            for (int y = 0; y < alto; y++)
+            {
+                ClearPieceAt(x,y);
+            }
+        }
+    }
+    private void ClearPieceAt(int x, int y)
+    {
+        Piezas pieceToClear = piezas[x, y];
+
+        if (pieceToClear != null)
+        {
+            piezas[x, y] = null;
+            Destroy(pieceToClear.gameObject);
+        }
+    }
+    private void ClearPieceAt(List<Piezas> gamePieces)
+    {
+        foreach (Piezas gp in gamePieces)
+        {
+            ClearPieceAt(gp.coordenadaX, gp.coordenadaY);
+        }
     }
 }
