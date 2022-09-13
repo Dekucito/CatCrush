@@ -104,7 +104,6 @@ public class Piezas : MonoBehaviour
         salida,
         MasSuavizado,
     }
-
     public enum TipoFicha
     {
         verde,

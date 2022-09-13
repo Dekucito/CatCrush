@@ -122,7 +122,6 @@ public class Board : MonoBehaviour
             LlenarMatrizAleatoriaEn(gamePiece.coordenadaX,gamePiece.coordenadaY);
         }
     }
-
     void LlenarMatrizAleatoriaEn(int x, int y)
     {
         GameObject go = PiezaAleatoria();
@@ -171,19 +170,19 @@ public class Board : MonoBehaviour
             List<Piezas> ListaPiezaInicial = EncontrarCoincidenciaEn(initi.indiceX, initi.indiceY);
             List<Piezas> ListaPiezaFinal = EncontrarCoincidenciaEn(end.indiceX, end.indiceY);
 
-            var ListasCombiadas = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
-
-            if (ListasCombiadas.Count == 0)
+            if (ListaPiezaInicial.Count == 0 && ListaPiezaFinal.Count==0)
             {
                 GpIn.Moverpieza(initi.indiceX, initi.indiceY, swapTime);
                 GpEnd.Moverpieza(end.indiceX, end.indiceY, swapTime);
             }
-            else
-            {
-                ClearPieceAt(ListasCombiadas);
-                /*ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
-                ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);*/
-            }
+
+            ClearPieceAt(ListaPiezaInicial);
+            ClearPieceAt(ListaPiezaFinal);
+
+            CollapseColum(ListaPiezaInicial);
+            CollapseColum(ListaPiezaFinal);
+            /*ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
+            ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);*/
         }
     }
     bool vecino(Tile ini, Tile fin)
@@ -388,5 +387,57 @@ public class Board : MonoBehaviour
         {
             ClearPieceAt(gp.coordenadaX, gp.coordenadaY);
         }
+    }
+    List<Piezas> CollapseColum(int column, float colapseTime = 0.1f)
+    {
+        List<Piezas> movingPieces = new List<Piezas>();
+
+        for (int i = 0; i < alto -1; i++)
+        {
+            if (piezas[column,i] == null)
+            {
+                for (int j = i + 1; j < alto; j++)
+                {
+                    if (piezas[column, j] != null)
+                    {
+                        piezas[column, j].Moverpieza(column, i, colapseTime);
+                        piezas[column, i] = piezas[column, j];
+                        piezas[column, j].Coordenada(column, i);
+
+                        if (!movingPieces.Contains(piezas[column, i]))
+                        {
+                            movingPieces.Add(piezas[column, i]);
+                        }
+                        piezas[column, j] = null;
+                        break;
+                    }
+                }
+            }
+        }
+        return movingPieces;
+    }
+    List<Piezas> CollapseColum(List<Piezas> PiezaDeJuego)
+    {
+        List<Piezas> movingPieces = new List<Piezas>();
+        List<int> columnsToCollapse = GetColumns(PiezaDeJuego);
+
+        foreach (int colums in columnsToCollapse)
+        {
+            movingPieces = movingPieces.Union(CollapseColum(colums)).ToList();
+        }
+        return movingPieces;
+    }
+    List<int> GetColumns(List<Piezas> gamePieces)
+    {
+        List<int> collumnsIndex = new List<int>();
+
+        foreach (Piezas Gp in gamePieces)
+        {
+            if (!collumnsIndex.Contains(Gp.coordenadaX))
+            {
+                collumnsIndex.Add(Gp.coordenadaX);
+            }
+        }
+        return collumnsIndex;
     }
 }

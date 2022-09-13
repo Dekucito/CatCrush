@@ -152,8 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ecabbde8f623a409cf0edfc5435740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alto: 10
-  ancho: 10
+  alto: 6
+  ancho: 6
   preFile: {fileID: 6972442591713200693, guid: 0c1f7677883d8cb44af16ba4d433860a, type: 3}
   cam: {fileID: 519420031}
   borde: 1
