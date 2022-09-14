@@ -175,12 +175,11 @@ public class Board : MonoBehaviour
                 GpIn.Moverpieza(initi.indiceX, initi.indiceY, swapTime);
                 GpEnd.Moverpieza(end.indiceX, end.indiceY, swapTime);
             }
-
-            ClearPieceAt(ListaPiezaInicial);
-            ClearPieceAt(ListaPiezaFinal);
-
-            CollapseColum(ListaPiezaInicial);
-            CollapseColum(ListaPiezaFinal);
+            else
+            {
+                ListaPiezaInicial = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
+                ClearAndRefillBoard(ListaPiezaInicial);
+            }
             /*ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
             ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);*/
         }
@@ -343,6 +342,16 @@ public class Board : MonoBehaviour
         var listasCombinadas = horizontal.Union(vertical).ToList();
         return listasCombinadas;
     }
+    private List<Piezas> EncontrarCoincidenciaEn(List<Piezas> gamePieces, int minMatch = 3)
+    {
+        List<Piezas> matches = new List<Piezas>();
+
+        foreach (Piezas gp  in gamePieces)
+        {
+            matches = matches.Union(EncontrarCoincidenciaEn(gp.coordenadaX,gp.coordenadaY)).ToList();
+        }
+        return matches;
+    }
     public List<Piezas> EncontrarTodasLasCoincidencias()
     {
         List<Piezas> todasLasCoincidencias = new List<Piezas>();
@@ -385,7 +394,10 @@ public class Board : MonoBehaviour
     {
         foreach (Piezas gp in gamePieces)
         {
-            ClearPieceAt(gp.coordenadaX, gp.coordenadaY);
+            if (gp != null)
+            {
+                ClearPieceAt(gp.coordenadaX, gp.coordenadaY);
+            }
         }
     }
     List<Piezas> CollapseColum(int column, float colapseTime = 0.1f)
@@ -439,5 +451,43 @@ public class Board : MonoBehaviour
             }
         }
         return collumnsIndex;
+    }
+    void ClearAndRefillBoard(List<Piezas> gamePieces)
+    {
+        StartCoroutine(ClearAndRefillBoardRoutine(gamePieces));
+    }
+    IEnumerator ClearAndRefillBoardRoutine(List<Piezas> gamepieces)
+    {
+        yield return StartCoroutine(ClearAndCollapseColumns(gamepieces));
+        yield return null;
+        yield return StartCoroutine(RefillRoutine());
+    }
+    IEnumerator ClearAndCollapseColumns(List<Piezas> gamepieces)
+    {
+        List<Piezas> movingPiece = new List<Piezas>();
+        List<Piezas> matchs = new List<Piezas>();
+
+        bool isFinished = false;
+        while (!isFinished)
+        {
+            ClearPieceAt(gamepieces);
+            yield return  new WaitForSeconds(.5f);
+            movingPiece = CollapseColum(gamepieces);
+            yield return  new WaitForSeconds(.5f);
+            matchs = EncontrarCoincidenciaEn(movingPiece);
+            if (matchs.Count ==0)
+            {
+                isFinished = true;
+                break;
+            }
+            else
+            {
+                yield return StartCoroutine(ClearAndCollapseColumns(matchs));
+            }
+        }
+    }
+    IEnumerator RefillRoutine()
+    {
+        yield return null;    
     }
 }
