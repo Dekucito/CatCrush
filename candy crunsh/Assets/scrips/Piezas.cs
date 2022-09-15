@@ -106,14 +106,11 @@ public class Piezas : MonoBehaviour
     }
     public enum TipoFicha
     {
-        verde,
-        azul_marino,
-        azul_oscuro,
-        rosado,
-        morado,
-        verde_oscuro,
-        beich,
-        rojo,
-        blanco,
+        esmerald,
+        Bone,
+        Sapphire,
+        diamond,
+        monsterEye,
+        Skull,
     }
 }

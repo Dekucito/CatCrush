@@ -152,20 +152,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ecabbde8f623a409cf0edfc5435740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alto: 6
-  ancho: 6
-  preFile: {fileID: 6972442591713200693, guid: 0c1f7677883d8cb44af16ba4d433860a, type: 3}
+  alto: 7
+  ancho: 8
+  preFile: {fileID: 1165846929714891821, guid: 9a3da583e1b1c1448896e2a932a62ee7, type: 3}
   cam: {fileID: 519420031}
   borde: 1
   goPrefabs:
-  - {fileID: 884250108359273278, guid: 05ab3fbef6d9c44458338a003a4a031a, type: 3}
-  - {fileID: 7600906682615681780, guid: 160303c95893239449a65fb9629c8fe6, type: 3}
-  - {fileID: 8084016062173191951, guid: 282774522df13f043baa78acc9ce9a41, type: 3}
-  - {fileID: 4090415913832588363, guid: 18cbc0eef71068b4682cc0ba6c2c45c5, type: 3}
-  - {fileID: 6477772752665558814, guid: 470ce9ea5b6c6514a9f52d7ee7e9c1f8, type: 3}
+  - {fileID: 5885885679333128513, guid: 3cbdb8b1bfb37f34295cd0ad122faffc, type: 3}
+  - {fileID: 3006842651912917363, guid: 104ea87f27309d344974ca760d88743e, type: 3}
+  - {fileID: 8942922336298267568, guid: 1b22251fa5865354bb72c72e224542f5, type: 3}
+  - {fileID: 2849783242324228121, guid: 4b4facade0dc2b9458e239f7617100d7, type: 3}
+  - {fileID: 2257429428914064788, guid: 3e8f7e3eb52718b4bac169be4c87e955, type: 3}
+  - {fileID: 8798938754731112608, guid: a9b4a9d68d7b85742933e832de903da2, type: 3}
   initialPiece: {fileID: 0}
   endPiece: {fileID: 0}
   swapTime: 0.3
+  puedeMover: 1
 --- !u!4 &342645402
 Transform:
   m_ObjectHideFlags: 0
