@@ -2,9 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class Board : MonoBehaviour
 {
+    [Header("sonidos")]
+    public AudioSource audi;
+    public AudioClip elSonido;
+    public AudioClip elSonido2;
+    public bool Combo = false;
+
+    [Header("score")]
+    public static int scoreValue = 0;
+    public TMP_Text score;
+    private string scoreEnPantalla;
+    public string scoreFinal;
+    public int points = 10;
+
+    [Header("valores de boards")]
     public int alto;
     public int ancho;
     public Tile[,] board;
@@ -13,10 +28,10 @@ public class Board : MonoBehaviour
     public Camera cam;
     public int borde;
     public GameObject[] goPrefabs = new GameObject[2];
-
     public Tile initialPiece;
     public Tile endPiece;
 
+    [Header("tiempo y condiciones")]
     [Range(0, .5f)]
     public float swapTime = .3f;
     public bool puedeMover = true;
@@ -27,6 +42,25 @@ public class Board : MonoBehaviour
         CrearBoard();
         OrganizarCamara();
         LlenarMatriz();
+    }
+    public void Sonido()
+    {
+        if (Combo == true)
+        {
+            AudioSource.PlayClipAtPoint(elSonido2, gameObject.transform.position);
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(elSonido, gameObject.transform.position);
+        }
+    }
+    public void Score(int points)
+    {
+        scoreValue += points;
+        scoreEnPantalla = "Score" + ":" + scoreValue;
+        score.text = scoreEnPantalla;
+
+        scoreFinal = score.text;
     }
     void CrearBoard()
     {
@@ -109,7 +143,6 @@ public class Board : MonoBehaviour
             }
             else
             {
-                Debug.Log(interacciones);
                 coincidencias = coincidencias.Intersect(addPieces).ToList();
                 ReemplazarConPiezaAleatoria(coincidencias);
             }
@@ -183,6 +216,8 @@ public class Board : MonoBehaviour
                 List<Piezas> ListaPiezaInicial = EncontrarCoincidenciaEn(initi.indiceX, initi.indiceY);
                 List<Piezas> ListaPiezaFinal = EncontrarCoincidenciaEn(end.indiceX, end.indiceY);
 
+                List<Piezas> combinada = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
+
                 if (ListaPiezaInicial.Count == 0 && ListaPiezaFinal.Count == 0)
                 {
                     GpIn.Moverpieza(initi.indiceX, initi.indiceY, swapTime);
@@ -192,8 +227,21 @@ public class Board : MonoBehaviour
                 }
                 else
                 {
-                    ListaPiezaInicial = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
-                    ClearAndRefillBoard(ListaPiezaInicial);
+                    if (combinada.Count >=4)
+                    {
+                        Combo = true;
+                        ListaPiezaInicial = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
+                        Score(points*2);
+                        Sonido();
+                        ClearAndRefillBoard(ListaPiezaInicial);
+                    }
+                    if (combinada.Count == 3)
+                    {
+                        ListaPiezaInicial = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
+                        Score(points);
+                        Sonido();
+                        ClearAndRefillBoard(ListaPiezaInicial);
+                    }
                 }
                 /*ResaltarCoincidenciaEn(GpIn.coordenadaX, GpIn.coordenadaY);
                 ResaltarCoincidenciaEn(GpEnd.coordenadaX, GpEnd.coordenadaY);*/
@@ -503,6 +551,8 @@ public class Board : MonoBehaviour
             }
             else
             {
+                Score(points);
+                Sonido();
                 yield return StartCoroutine(ClearAndCollapseColumns(matchs));
             }
         }
