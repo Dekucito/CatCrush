@@ -229,17 +229,18 @@ public class Board : MonoBehaviour
                 {
                     if (combinada.Count >=4)
                     {
+                        Sonido();
                         Combo = true;
                         ListaPiezaInicial = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
                         Score(points*2);
-                        Sonido();
                         ClearAndRefillBoard(ListaPiezaInicial);
+                        Combo = false;
                     }
                     if (combinada.Count == 3)
                     {
+                        Sonido();
                         ListaPiezaInicial = ListaPiezaInicial.Union(ListaPiezaFinal).ToList();
                         Score(points);
-                        Sonido();
                         ClearAndRefillBoard(ListaPiezaInicial);
                     }
                 }
