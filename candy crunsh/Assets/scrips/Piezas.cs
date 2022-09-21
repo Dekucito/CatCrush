@@ -106,11 +106,11 @@ public class Piezas : MonoBehaviour
     }
     public enum TipoFicha
     {
-        esmerald,
-        Bone,
-        Sapphire,
-        diamond,
-        monsterEye,
-        Skull,
+        monstruo1,
+        monstruo2,
+        monstruo3,
+        monstruo4,
+        monstruo5,
+        monstruo6,
     }
 }
