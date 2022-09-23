@@ -6,11 +6,12 @@ using TMPro;
 
 public class Board : MonoBehaviour
 {
+
     [Header("sonidos")]
     public AudioSource audi;
-    public AudioClip elSonido;
-    public AudioClip elSonido2;
-    public bool Combo = false;
+    public AudioClip soundOne;
+    public AudioClip soundTwo;
+    public bool smash = false;
 
     [Header("score")]
     public static int scoreValue = 0;
@@ -18,6 +19,20 @@ public class Board : MonoBehaviour
     private string scoreEnPantalla;
     public string scoreFinal;
     public int points = 10;
+
+    public EnemyController[] enemy;
+
+    [Header("Movimiento")]
+    public int move = 20;
+    public TMP_Text movements;
+
+    [Header("Timepo")]
+    public float initialTime;
+    [Range(-10.0f, 10.0f)] public float timeScale =1;
+    public TMP_Text time;
+    private float timeFrameScale = 0f;
+    private float timeSeconds = 0f;
+    private float initialScaleTime; 
 
     [Header("valores de boards")]
     public int height;
@@ -30,6 +45,8 @@ public class Board : MonoBehaviour
 
     [Range(0, .5f)]
     public float swapTime = .3f;
+
+    public Color color;
 
     Tile[,] m_allTiles;
     Piezas[,] m_allGamePieces;
@@ -47,29 +64,22 @@ public class Board : MonoBehaviour
     private void Start()
     {
         SetParents();
+        Movements();
 
         m_allTiles = new Tile[width, height];
         m_allGamePieces = new Piezas[width, height];
 
+        InitialTime();
+
         SetupTiles();
         SetupCamera();
-        FillBoard(10, .5f);
+        FillBoard(50, .5f);
     }
-
-    private void SetParents()
+    private void Update()
     {
-        if (tileParent == null)
-        {
-            tileParent = new GameObject().transform;
-            tileParent.name = "Tiles";
-            tileParent.parent = this.transform;
-        }
-        if (gamePieceParent == null)
-        {
-            gamePieceParent = new GameObject().transform;
-            gamePieceParent.name = "GamePieces";
-            gamePieceParent = this.transform;
-        }
+        GameOver();
+        TimeStart();
+        Movements();
     }
     void SetupCamera()
     {
@@ -196,6 +206,7 @@ public class Board : MonoBehaviour
     {
         if (m_playerInputEnabled)
         {
+            m_playerInputEnabled = false;
             Piezas clickedPiece = m_allGamePieces[clickedTile.xindicex, clickedTile.yindicex];
             Piezas targePiece = m_allGamePieces[targetTile.xindicex, targetTile.yindicex];
 
@@ -215,13 +226,27 @@ public class Board : MonoBehaviour
                 {
                     clickedPiece.Move(clickedTile.xindicex, clickedTile.yindicex, swapTime);
                     targePiece.Move(targetTile.xindicex, targetTile.yindicex, swapTime);
-
                     yield return new WaitForSeconds(swapTime);
+                    move = move - 1;
+                    m_playerInputEnabled = true;
                 }
                 else
                 {
+                    move = move - 1;
                     yield return new WaitForSeconds(swapTime);
-                    ClearAndRefillBoard(clickedPiecesMatches.Union(targetPieceMatches).ToList());
+                    ClearAndRefillBoard(clickedPiecesMatches = clickedPiecesMatches.Union(targetPieceMatches).ToList());
+
+                    if (clickedPiecesMatches.Count ==3)
+                    {
+                        sound();
+                        Score(points);
+                    }if (clickedPiecesMatches.Count >=4)
+                    {
+                        Score(points + 5);
+                        smash = true;
+                        sound();                     
+                        smash = false;
+                    }
                 }
             }
         }
@@ -381,10 +406,10 @@ public class Board : MonoBehaviour
         SpriteRenderer spriteRenderer = m_allTiles[x, y].GetComponent<SpriteRenderer>();
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
     }
-    void HighLightTileOn(int x, int y, Color col)
+    void HighLightTileOn(int x, int y,Color col)
     {
         SpriteRenderer spriteRendere = m_allTiles[x, y].GetComponent<SpriteRenderer>();
-        spriteRendere.color = col;
+        spriteRendere.color = color;
     }
     void HighLightMatchesAt(int x, int y)
     {
@@ -427,6 +452,7 @@ public class Board : MonoBehaviour
             m_allGamePieces[x, y] = null;
             Destroy(pieceToClear.gameObject);
         }
+        HighLightTileOff(x, y);
     }
     private void ClearPieceAt(List<Piezas> gamePieces)
     {
@@ -493,8 +519,10 @@ public class Board : MonoBehaviour
                 randomPiece.transform.position = new Vector2(x, y + falseOffset);
                 randomPiece.Move(x, y, moveTime);
             }
-          
-            randomPiece.transform.parent = gamePieceParent;
+            if (gamePieceParent != null)
+            {
+                randomPiece.transform.parent = gamePieceParent;
+            }
         }
         return randomPiece;
     }
@@ -568,7 +596,6 @@ public class Board : MonoBehaviour
     }
     IEnumerator ClearAndRefillBoardRoutine(List<Piezas> gamepieces)
     {
-        m_playerInputEnabled = true;
         List<Piezas> matches = gamepieces;
 
         do
@@ -584,6 +611,7 @@ public class Board : MonoBehaviour
     }
     IEnumerator ClearAndCollapseColumns(List<Piezas> gamepieces)
     {
+        int Comb = 0;
         List<Piezas> movingPiece = new List<Piezas>();
         List<Piezas> matchs = new List<Piezas>();
         HighLightPieces(gamepieces);
@@ -599,20 +627,33 @@ public class Board : MonoBehaviour
             movingPiece = CollapseColum(gamepieces);
             while (!isColapse(gamepieces))
             {
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
             yield return new WaitForSeconds(.5f);
 
             matchs = FindMatchesAt(movingPiece);
             if (matchs.Count == 0)
             {
+                m_playerInputEnabled = true;
                 isFinished = true;
+                if (Comb >=3)
+                {
+                    Score(100);
+                    Comb = 0;
+                }
+                if (Comb ==1)
+                {
+                    Score(points);
+                    Comb = 0;
+                }
+                Score(points *Comb);
+                Comb = 0;
                 break;
             }
             else
             {
-                Score(points);
-                Sonido();
+                m_playerInputEnabled = false;
+                Comb++;
                 yield return StartCoroutine(ClearAndCollapseColumns(matchs));
             }
         }
@@ -621,6 +662,7 @@ public class Board : MonoBehaviour
     IEnumerator RefillRoutine()
     {
         FillBoard(10, .5f);
+        m_playerInputEnabled = false;
         yield return null;
     }
     bool isColapse(List<Piezas> gamePieces)
@@ -637,15 +679,15 @@ public class Board : MonoBehaviour
         }
         return true;
     }
-    public void Sonido()
+    public void sound()
     {
-        if (Combo == true)
+        if (smash == true)
         {
-            AudioSource.PlayClipAtPoint(elSonido2, gameObject.transform.position);
+            AudioSource.PlayClipAtPoint(soundTwo, gameObject.transform.position);
         }
         else
         {
-            AudioSource.PlayClipAtPoint(elSonido, gameObject.transform.position);
+            AudioSource.PlayClipAtPoint(soundOne, gameObject.transform.position);
         }
     }
     public void Score(int points)
@@ -655,5 +697,64 @@ public class Board : MonoBehaviour
         score.text = scoreEnPantalla;
 
         scoreFinal = score.text;
+    }
+    private void TimeStart()
+    {
+        timeFrameScale = Time.deltaTime * timeScale;
+
+        timeSeconds += timeFrameScale;
+        Updatewatch(timeSeconds);
+    }
+    private void Updatewatch(float timeSeconds)
+    {
+        int min = 0;
+        int seconds = 0;
+        string textWatch;
+
+        if (timeSeconds < 0)
+        {
+            timeSeconds = 0;
+        }
+
+        min = (int)timeSeconds / 60;
+        seconds = (int)timeSeconds % 60;
+
+        textWatch = min.ToString("00") + ":" + seconds.ToString("00");
+        time.text = textWatch;
+    }
+    private void InitialTime()
+    {
+        initialScaleTime  = timeScale;
+        timeSeconds = initialTime;
+
+        Updatewatch(initialTime);
+    }
+    private void SetParents()
+    {
+        if (tileParent == null)
+        {
+            tileParent = new GameObject().transform;
+            tileParent.name = "Tile";
+            tileParent.parent = this.transform;
+        }
+
+        if (gamePieceParent == null)
+        {
+            gamePieceParent = new GameObject().transform;
+            gamePieceParent.name = "Piezas";
+            gamePieceParent.parent = this.transform;
+        }
+    }
+    public void GameOver()
+    {
+        if (move==0)
+        {
+            Debug.Log("llego a 0");
+            m_playerInputEnabled = false;
+        }
+    }
+    public void Movements()
+    {
+        movements.text = "Movimientos" + ":" + move.ToString(); 
     }
 }
