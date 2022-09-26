@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Board : MonoBehaviour
 {
@@ -17,13 +18,14 @@ public class Board : MonoBehaviour
     public static int scoreValue = 0;
     public TMP_Text score;
     private string scoreEnPantalla;
-    public string scoreFinal;
-    public int points = 10;
+    public int scoreFinal;
+    public int points;
 
-    public EnemyController[] enemy;
-
-    [Header("Movimiento")]
-    public int move = 20;
+    [Header("GameOver")]
+    public int MinPoints;
+    public bool gameOverForMove = false;
+    public bool gameOverForTimeAndPoints = false;
+    public int move;
     public TMP_Text movements;
 
     [Header("Timepo")]
@@ -32,9 +34,12 @@ public class Board : MonoBehaviour
     public TMP_Text time;
     private float timeFrameScale = 0f;
     private float timeSeconds = 0f;
-    private float initialScaleTime; 
+    private float initialScaleTime;
 
     [Header("valores de boards")]
+    public static int sceneCounts;
+    public Scene scene;
+
     public int height;
     public int width;
 
@@ -63,6 +68,8 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
+        sceneCounts = SceneManager.GetActiveScene().buildIndex;
+        scene = SceneManager.GetActiveScene();
         SetParents();
         Movements();
 
@@ -77,7 +84,7 @@ public class Board : MonoBehaviour
     }
     private void Update()
     {
-        GameOver();
+        GameOverForMovements();
         TimeStart();
         Movements();
     }
@@ -236,7 +243,11 @@ public class Board : MonoBehaviour
                     yield return new WaitForSeconds(swapTime);
                     ClearAndRefillBoard(clickedPiecesMatches = clickedPiecesMatches.Union(targetPieceMatches).ToList());
 
-                    if (clickedPiecesMatches.Count ==3)
+                    foreach (Piezas Piece in clickedPiecesMatches)
+                    {
+                        Piece.GetComponentInChildren<Animator>().SetBool("Animation",true);
+                    }
+                    if (clickedPiecesMatches.Count == 3)
                     {
                         sound();
                         Score(points);
@@ -665,6 +676,20 @@ public class Board : MonoBehaviour
         m_playerInputEnabled = false;
         yield return null;
     }
+    IEnumerator GameOverRutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene(0);
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadSceneAsync(scene.name);
+    }
+    IEnumerator WinRutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene(8);
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadSceneAsync(sceneCounts+1);
+    }
     bool isColapse(List<Piezas> gamePieces)
     {
         foreach (Piezas piece in gamePieces)
@@ -696,7 +721,7 @@ public class Board : MonoBehaviour
         scoreEnPantalla = "Points" + ":" + scoreValue;
         score.text = scoreEnPantalla;
 
-        scoreFinal = score.text;
+        scoreFinal += points;
     }
     private void TimeStart()
     {
@@ -715,12 +740,30 @@ public class Board : MonoBehaviour
         {
             timeSeconds = 0;
         }
-
         min = (int)timeSeconds / 60;
         seconds = (int)timeSeconds % 60;
 
         textWatch = min.ToString("00") + ":" + seconds.ToString("00");
         time.text = textWatch;
+
+        if (gameOverForTimeAndPoints ==true)
+        {
+            if (min <=0 && seconds <=0)
+            {
+                Debug.Log("entra1");
+
+                if (scoreFinal < MinPoints)
+                {
+                    Debug.Log("entra2");
+                    StartCoroutine("GameOverRutine");
+                    m_playerInputEnabled = false;
+                }
+                else
+                {
+                    StartCoroutine("WinRutine");
+                }
+            }
+        }
     }
     private void InitialTime()
     {
@@ -745,12 +788,23 @@ public class Board : MonoBehaviour
             gamePieceParent.parent = this.transform;
         }
     }
-    public void GameOver()
+    public void GameOverForMovements()
     {
-        if (move==0)
+        if (gameOverForMove==true)
         {
-            Debug.Log("llego a 0");
-            m_playerInputEnabled = false;
+            if (move == 0)
+            {
+                if (scoreFinal >= MinPoints)
+                {
+                    StartCoroutine("WinRutine");
+                }
+                else
+                {
+                    timeScale = 0;
+                    StartCoroutine("GameOverRutine");
+                    m_playerInputEnabled = false;
+                }
+            }   
         }
     }
     public void Movements()
