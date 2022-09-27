@@ -15,10 +15,10 @@ public class Board : MonoBehaviour
     public bool smash = false;
 
     [Header("score")]
-    public static int scoreValue = 0;
+    public int scoreValue = 0;
     public TMP_Text score;
     private string scoreEnPantalla;
-    public int scoreFinal;
+    public int scoreFinal =0;
     public int points;
 
     [Header("GameOver")]
@@ -38,7 +38,6 @@ public class Board : MonoBehaviour
 
     [Header("valores de boards")]
     public static int sceneCounts;
-    public Scene scene;
 
     public int height;
     public int width;
@@ -69,25 +68,26 @@ public class Board : MonoBehaviour
     private void Start()
     {
         sceneCounts = SceneManager.GetActiveScene().buildIndex;
-        scene = SceneManager.GetActiveScene();
         SetParents();
         Movements();
 
         m_allTiles = new Tile[width, height];
         m_allGamePieces = new Piezas[width, height];
 
+        scoreValue = 0;
+
         InitialTime();
 
         SetupTiles();
         SetupCamera();
         FillBoard(50, .5f);
-    }
+    } //En el start llamo las funciones principales que deben ejecutarse al iniciar el juego
     private void Update()
     {
         GameOverForMovements();
         TimeStart();
         Movements();
-    }
+    }// en el update mantengo actualizado el relos y las condiciones de GameOver
     void SetupCamera()
     {
         cam.transform.position = new Vector3(((float)width / 2) - .5f, ((float)height / 2) - .5f, -10);
@@ -102,7 +102,7 @@ public class Board : MonoBehaviour
         {
             cam.orthographicSize = alt;
         }
-    }
+    }// configurar la camara en el centro del tablero y que se adapte a el tamaño de la matriz
     void SetupTiles()
     {
         m_allTiles = new Tile[width, height];
@@ -121,7 +121,7 @@ public class Board : MonoBehaviour
                 m_allTiles[x, y].Init(x, y, this);
             }
         }
-    }
+    }// crea el tablero
     void FillBoard(int falseOffSett = 0, float moveTime = .1f)
     {
         List<Piezas> addedPieces = new List<Piezas>();
@@ -181,21 +181,21 @@ public class Board : MonoBehaviour
             }
             interations++;
         }
-    }
+    }// rellenar la board con las piezas de juego
     public void ClickedTile(Tile tile)
     {
         if (m_clickedTile == null)
         {
             m_clickedTile = tile;
         }
-    }
+    }// detecta sobre cual Tile presionas
     public void DragToTile(Tile tile)
     {
         if (m_clickedTile != null && IsNexTo(tile,m_clickedTile))
         {
             m_targetTile = tile;
         }
-    }
+    }// detectas sobre que mouse esta el cursor
     public void ReleaseTile()
     {
         if (m_clickedTile != null && m_targetTile != null)
@@ -204,11 +204,11 @@ public class Board : MonoBehaviour
         }
         m_clickedTile = null;
         m_targetTile = null;
-    }
+    } // compara si los tiles no son nulos, llama la funcion SwitchTiles y vuelve los tiles nulos
     void SwitchTiles(Tile m_clickedTile, Tile m_targetTile)
     {
         StartCoroutine(SwitchTilesRoutine(m_clickedTile, m_targetTile));
-    }
+    }// llama corrutina SwitchTilesRoutine
     IEnumerator SwitchTilesRoutine(Tile clickedTile, Tile targetTile)
     {
         if (m_playerInputEnabled)
@@ -243,14 +243,10 @@ public class Board : MonoBehaviour
                     yield return new WaitForSeconds(swapTime);
                     ClearAndRefillBoard(clickedPiecesMatches = clickedPiecesMatches.Union(targetPieceMatches).ToList());
 
-                    foreach (Piezas Piece in clickedPiecesMatches)
-                    {
-                        Piece.GetComponentInChildren<Animator>().SetBool("Animation",true);
-                    }
                     if (clickedPiecesMatches.Count == 3)
                     {
-                        sound();
                         Score(points);
+                        sound();
                     }if (clickedPiecesMatches.Count >=4)
                     {
                         Score(points + 5);
@@ -261,11 +257,11 @@ public class Board : MonoBehaviour
                 }
             }
         }
-    }
+    }// mover piezas y llamar rutinas de colapsarColumnas
     void ClearAndRefillBoard(List<Piezas> gamePieces)
     {
         StartCoroutine(ClearAndRefillBoardRoutine(gamePieces));
-    }
+    }// vacia y rellena la board
     List<Piezas> FindMatches(int starX, int starY, Vector2 searchDirection, int minLength = 3)
     {
         List<Piezas> matches = new List<Piezas>();
@@ -323,7 +319,7 @@ public class Board : MonoBehaviour
             return matches;
         }
         return null;
-    }
+    }// busca coincidencias
     List<Piezas> FindVerticalMatches(int startX, int startY, int minLenght = 3)
     {
         List<Piezas> upwardMatches = FindMatches(startX, startY, Vector2.up, 2);
@@ -340,7 +336,7 @@ public class Board : MonoBehaviour
         var combinedMatches = upwardMatches.Union(downwarMAtches).ToList();
 
         return combinedMatches.Count >= minLenght ? combinedMatches : null;
-    }
+    }// busca coincidencias verticales
     List<Piezas> FindHorizontalMatches(int startX, int startY, int minLenght = 3)
     {
         List<Piezas> rigthMatches = FindMatches(startX, startY, Vector2.right, 2);
@@ -357,7 +353,7 @@ public class Board : MonoBehaviour
         var combinedMatches = rigthMatches.Union(leftMatches).ToList();
 
         return combinedMatches.Count >= minLenght ? combinedMatches : null;
-    }
+    }// busca coincidencias horizontales
     private List<Piezas> FindMatchesAt(int x, int y, int minLenght = 3)
     {
         List<Piezas> horizontalMatches = FindHorizontalMatches(x, y, minLenght);
@@ -372,10 +368,14 @@ public class Board : MonoBehaviour
         {
             verticalMatches = new List<Piezas>();
         }
-
+        if (horizontalMatches.Count != 0 && verticalMatches.Count !=0)
+        {
+            Score(15);
+            Debug.Log("un cruce jsjs, ni idea como hacer que las encuentre por separado <3");
+        }
         var combinedMatches = horizontalMatches.Union(verticalMatches).ToList();
         return combinedMatches;
-    }
+    }// busca coincidencias en horizontal y vertical
     private List<Piezas> FindMatchesAt(List<Piezas> gamePieces, int minMatch = 3)
     {
         List<Piezas> matches = new List<Piezas>();
@@ -385,7 +385,7 @@ public class Board : MonoBehaviour
             matches = matches.Union(FindMatchesAt(piece.xIndex, piece.yIndex)).ToList();
         }
         return matches;
-    }
+    }// sobre carga de FindMatchesAt
     bool IsNexTo(Tile start, Tile end)
     {
 
@@ -393,12 +393,12 @@ public class Board : MonoBehaviour
         {
             return true;
         }
-            if (Mathf.Abs(start.yindicex - end.yindicex) == 1 && start.xindicex == end.xindicex)
-            {
-                return true;
-            }
-                return false;
-    }
+        if (Mathf.Abs(start.yindicex - end.yindicex) == 1 && start.xindicex == end.xindicex)
+        {
+            return true;
+        }
+            return false;
+    }// condicion para saber si es vecino y retornar un Bool        
     public List<Piezas> FindAllMatches()
     {
         List<Piezas> combinedMatches = new List<Piezas>();
@@ -411,17 +411,17 @@ public class Board : MonoBehaviour
             }
         }
         return combinedMatches;
-    }
+    } // busca todas las coincidencias
     void HighLightTileOff(int x, int y)
     {
         SpriteRenderer spriteRenderer = m_allTiles[x, y].GetComponent<SpriteRenderer>();
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
-    }
+    }// apaga la funcion de resaltar tiles
     void HighLightTileOn(int x, int y,Color col)
     {
         SpriteRenderer spriteRendere = m_allTiles[x, y].GetComponent<SpriteRenderer>();
         spriteRendere.color = color;
-    }
+    }//enciende colores de los tiles
     void HighLightMatchesAt(int x, int y)
     {
         HighLightTileOff(x, y);
@@ -433,7 +433,7 @@ public class Board : MonoBehaviour
                 HighLightTileOn(Piece.xIndex, Piece.yIndex, Piece.GetComponent<SpriteRenderer>().color);
             }
         }
-    }
+    }// resalta todas las condiciones 
     void HighLightMatches()
     {
         for (int x = 0; x < width; x++)
@@ -443,7 +443,7 @@ public class Board : MonoBehaviour
                 HighLightMatchesAt(x, y);
             }
         }
-    }
+    } // aqui se buscan las posiciones de los matches a encender 
     void HighLightPieces(List<Piezas> gamePieces)
     {
         foreach (Piezas piece in gamePieces)
@@ -453,7 +453,7 @@ public class Board : MonoBehaviour
                 HighLightTileOn(piece.xIndex, piece.yIndex, piece.GetComponent<SpriteRenderer>().color);
             }
         }
-    }
+    }// se pregunta si lsa fichas son diferentes de null para poder encenderlas
     private void ClearPieceAt(int x, int y)
     {
         Piezas pieceToClear = m_allGamePieces[x, y];
@@ -464,7 +464,7 @@ public class Board : MonoBehaviour
             Destroy(pieceToClear.gameObject);
         }
         HighLightTileOff(x, y);
-    }
+    }// escogemos las piezas las cuales debemos de apagar y elminar junto a los tiles
     private void ClearPieceAt(List<Piezas> gamePieces)
     {
         foreach (Piezas piece in gamePieces)
@@ -474,7 +474,7 @@ public class Board : MonoBehaviour
                 ClearPieceAt(piece.xIndex, piece.yIndex);
             }
         }
-    }
+    }// aqui mandamos las piezas a el otro metodo, pero solo si son diferentes de nullas
     void ClearBoard()
     {
         for (int x = 0; x < width; x++)
@@ -484,7 +484,7 @@ public class Board : MonoBehaviour
                 ClearPieceAt(x, y);
             }
         }
-    }
+    }// recorre toda la matriz para limpiarla
     GameObject GetRandomPiece()
     {
         int randomInx = Random.Range(0, gamePiecesPrefabas.Length);
@@ -493,7 +493,7 @@ public class Board : MonoBehaviour
             Debug.LogWarning("La clase board en el array de prefabs en la posicion {randominx} no contiene una pieza valida");
         }
         return gamePiecesPrefabas[randomInx];
-    }
+    }// aqui se crea la pieza aleatoria y se retorna para otro metodo
     public void PlaceGamePiece(Piezas gamePiece, int x, int y)
     {
         if (gamePieceParent == null)
@@ -511,11 +511,11 @@ public class Board : MonoBehaviour
         }
 
         gamePiece.SetCoord(x, y);
-    }
+    }//se verifica si la pieza no es null y se le da la posicion
     bool IsWithBounds(int _x, int _y)
     {
         return (_x >= 0 && _x < width && _y >= 0 && _y < height);
-    }
+    }// se retorna un entero que recorre la "Array"
     Piezas FillRandomAt(int x, int y, int falseOffset = 0, float moveTime = .1f)
     {
         Piezas randomPiece = Instantiate(GetRandomPiece(), Vector2.zero, Quaternion.identity).GetComponent<Piezas>();
@@ -536,7 +536,7 @@ public class Board : MonoBehaviour
             }
         }
         return randomPiece;
-    }
+    }// ponemos una pieza en el lugar del RandomPiece
     private void ReplaceWithRandom(List<Piezas> gamePiece, int falseOffset = 0, float moveTime = .1f)
     {
         foreach (Piezas piece in gamePiece)
@@ -551,7 +551,7 @@ public class Board : MonoBehaviour
                 FillRandomAt(piece.xIndex, piece.yIndex, falseOffset, moveTime);
             }
         }
-    }
+    }// reemplazamos por fichas random
     List<Piezas> CollapseColum(int column, float colapseTime = 0.1f)
     {
         List<Piezas> movingPieces = new List<Piezas>();
@@ -580,7 +580,7 @@ public class Board : MonoBehaviour
             }
         }
         return movingPieces;
-    }
+    }// se selecciona la columna para recorrer y colapsar
     List<Piezas> CollapseColum(List<Piezas> gamePieces)
     {
         List<Piezas> movingPieces = new List<Piezas>();
@@ -591,7 +591,7 @@ public class Board : MonoBehaviour
             movingPieces = movingPieces.Union(CollapseColum(colums)).ToList();
         }
         return movingPieces;
-    }
+    }// se reciben piezas y se reunen en una lista nueva
     List<int> GetColumns(List<Piezas> gamePieces)
     {
         List<int> columns = new List<int>();
@@ -604,13 +604,16 @@ public class Board : MonoBehaviour
             }
         }
         return columns;
-    }
+    }// revisa las columnas
     IEnumerator ClearAndRefillBoardRoutine(List<Piezas> gamepieces)
     {
         List<Piezas> matches = gamepieces;
-
         do
         {
+            foreach (Piezas Piece in matches)
+            {
+                Piece.GetComponentInChildren<Animator>().SetBool("Animation", true);
+            }
             yield return StartCoroutine(ClearAndCollapseColumns(matches));
             yield return null;
             yield return StartCoroutine(RefillRoutine());
@@ -619,7 +622,7 @@ public class Board : MonoBehaviour
         }
         while (matches.Count != 0);
         m_playerInputEnabled = true;
-    }
+    }// juntamos todas varias corrutinas para limpiar y rellenar 
     IEnumerator ClearAndCollapseColumns(List<Piezas> gamepieces)
     {
         int Comb = 0;
@@ -646,50 +649,52 @@ public class Board : MonoBehaviour
             if (matchs.Count == 0)
             {
                 m_playerInputEnabled = true;
-                isFinished = true;
-                if (Comb >=3)
-                {
-                    Score(100);
-                    Comb = 0;
-                }
-                if (Comb ==1)
-                {
-                    Score(points);
-                    Comb = 0;
-                }
-                Score(points *Comb);
                 Comb = 0;
+                isFinished = true;
                 break;
             }
             else
             {
                 m_playerInputEnabled = false;
                 Comb++;
+                foreach (Piezas piece in matchs)
+                {
+                    piece.GetComponentInChildren<Animator>().SetBool("Animation", true);
+                }
+                if (Comb >= 3)
+                {
+                    Score(100);
+                    Comb = 0;
+                }
+                if (Comb == 1)
+                {
+                    Score(points);
+                    Comb = 0;
+                }
                 yield return StartCoroutine(ClearAndCollapseColumns(matchs));
             }
         }
         yield return null;
-    }
+    }// funcion principal que limpia y colapsa las columnas
     IEnumerator RefillRoutine()
     {
         FillBoard(10, .5f);
         m_playerInputEnabled = false;
         yield return null;
-    }
+    }// rutin para rellenar la matriz
     IEnumerator GameOverRutine()
     {
-        yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadScene(0);
-        yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadSceneAsync(scene.name);
-    }
+
+        SceneController.Instance.lastScene = SceneManager.GetActiveScene().buildIndex; ;
+        yield return new WaitForSeconds(1f);
+        SceneController.Instance.Corrutine();
+        SceneManager.LoadScene(8);
+    }// rutina para cambio de escena a GameOver
     IEnumerator WinRutine()
     {
         yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadScene(8);
-        yield return new WaitForSeconds(1.5f);
-        SceneManager.LoadSceneAsync(sceneCounts+1);
-    }
+        SceneManager.LoadSceneAsync(sceneCounts + 1);
+    }// rutina para cambio de escena a Win
     bool isColapse(List<Piezas> gamePieces)
     {
         foreach (Piezas piece in gamePieces)
@@ -703,7 +708,7 @@ public class Board : MonoBehaviour
             }
         }
         return true;
-    }
+    }// bool para saber si hay columnas colapsando
     public void sound()
     {
         if (smash == true)
@@ -714,7 +719,7 @@ public class Board : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(soundOne, gameObject.transform.position);
         }
-    }
+    }// metodo para que se activen los sonios
     public void Score(int points)
     {
         scoreValue += points;
@@ -722,14 +727,14 @@ public class Board : MonoBehaviour
         score.text = scoreEnPantalla;
 
         scoreFinal += points;
-    }
+    }// funcion para mostrar el score en pantalla
     private void TimeStart()
     {
         timeFrameScale = Time.deltaTime * timeScale;
 
         timeSeconds += timeFrameScale;
         Updatewatch(timeSeconds);
-    }
+    }// inicio del contador del tiempo
     private void Updatewatch(float timeSeconds)
     {
         int min = 0;
@@ -754,24 +759,25 @@ public class Board : MonoBehaviour
 
                 if (scoreFinal < MinPoints)
                 {
-                    Debug.Log("entra2");
                     StartCoroutine("GameOverRutine");
                     m_playerInputEnabled = false;
+                    scoreValue = 0;
                 }
                 else
                 {
                     StartCoroutine("WinRutine");
+                    scoreValue = 0;
                 }
             }
         }
-    }
+    } // actualiza el reloj
     private void InitialTime()
     {
         initialScaleTime  = timeScale;
         timeSeconds = initialTime;
 
         Updatewatch(initialTime);
-    }
+    }// inicializacion del tiempo
     private void SetParents()
     {
         if (tileParent == null)
@@ -787,7 +793,7 @@ public class Board : MonoBehaviour
             gamePieceParent.name = "Piezas";
             gamePieceParent.parent = this.transform;
         }
-    }
+    }// envia los tiles y las piezas de juego a un parent para que queden ordenados 
     public void GameOverForMovements()
     {
         if (gameOverForMove==true)
@@ -797,18 +803,20 @@ public class Board : MonoBehaviour
                 if (scoreFinal >= MinPoints)
                 {
                     StartCoroutine("WinRutine");
+                    scoreValue = 0;
                 }
                 else
                 {
                     timeScale = 0;
                     StartCoroutine("GameOverRutine");
                     m_playerInputEnabled = false;
+                    scoreValue = 0;
                 }
             }   
         }
-    }
+    }//funcion de gameover por movimientos
     public void Movements()
     {
         movements.text = "Movimientos" + ":" + move.ToString(); 
-    }
+    }//funcion para mostrar los movimientos en pantalla
 }

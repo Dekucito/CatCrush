@@ -14,18 +14,17 @@ public class Tile : MonoBehaviour
 
         xindicex = x;
         yindicex = y;
-    }
-
+    }// guarda las coordenadas de los tile y el valor de la board
     public void OnMouseDown()
     {
         m_board.ClickedTile(this);
-    }
+    }// cuando hace click una ficha llama la funcion ClickedTile
     public void OnMouseEnter()
     {
         m_board.DragToTile(this);
-    }
+    }// cuando pasa el cursor sobre una ficha llama la funcion DragToTile
     public void OnMouseUp()
     {
         m_board.ReleaseTile();
-    }
+    } // cuadno suelta el click llama la funcion ReleaseTile
 }

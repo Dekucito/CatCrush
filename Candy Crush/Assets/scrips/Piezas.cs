@@ -18,18 +18,18 @@ public class Piezas : MonoBehaviour
     {
         xIndex = x;
         yIndex = y;
-    }
+    }// envia coordenadas a las piezas
    public void Init(Board board)
     {
         m_board = board;
-    }
+    }// da un valor a la variable m_board
    public void Move(int x, int y, float moveTime)
    {
         if (m_isMoving == true)
         {
             StartCoroutine(MoveRoutine(x,y, moveTime));
         }
-   }
+   }//inicia la corrutina de mover piezas, que le da el tipo de movimiento a las fichas
     IEnumerator MoveRoutine(int destX, int destY, float timeToMove)
     {
         Vector2 starPosition = transform.position;
@@ -73,7 +73,7 @@ public class Piezas : MonoBehaviour
            yield return null;
         }
         m_isMoving = true;
-    }
+    }// le da el tipo de movimiento a las fichas creando diferentes casos
     public enum InterpType
     {
         Linear,
@@ -81,7 +81,7 @@ public class Piezas : MonoBehaviour
         EseIn,
         SmoothStep,
         SmoottherStep,
-    }
+    }// tipo de movimiento
     public enum MatchValue
     {
         monstruo1,
@@ -90,5 +90,5 @@ public class Piezas : MonoBehaviour
         monstruo4,
         monstruo5,
         monstruo6,
-    }
+    }// tipo de ficha
 }

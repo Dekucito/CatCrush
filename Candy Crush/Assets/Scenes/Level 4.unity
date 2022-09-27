@@ -223,7 +223,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -15.800007, y: -42.10001}
+  m_AnchoredPosition: {x: -15.800003, y: -42.100006}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &226282550
@@ -490,15 +490,16 @@ MonoBehaviour:
   soundOne: {fileID: 8300000, guid: 7794cb330bc5ded49b9f3529648fca7f, type: 3}
   soundTwo: {fileID: 8300000, guid: 50cee2b9edd9ef449822383a92bfec20, type: 3}
   smash: 0
+  scoreValue: 0
   score: {fileID: 1004247249}
   scoreFinal: 0
   points: 5
-  MinPoints: 100
-  gameOverForMove: 1
-  gameOverForTimeAndPoints: 0
-  move: 5
+  MinPoints: 350
+  gameOverForMove: 0
+  gameOverForTimeAndPoints: 1
+  move: 25
   movements: {fileID: 1216357794}
-  initialTime: 10
+  initialTime: 400
   timeScale: -1
   time: {fileID: 304227357}
   height: 8

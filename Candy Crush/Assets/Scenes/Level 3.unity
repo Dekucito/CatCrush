@@ -356,19 +356,20 @@ MonoBehaviour:
   soundOne: {fileID: 8300000, guid: 7794cb330bc5ded49b9f3529648fca7f, type: 3}
   soundTwo: {fileID: 8300000, guid: 50cee2b9edd9ef449822383a92bfec20, type: 3}
   smash: 0
+  scoreValue: 0
   score: {fileID: 1004247249}
   scoreFinal: 0
   points: 5
-  MinPoints: 100
+  MinPoints: 250
   gameOverForMove: 1
   gameOverForTimeAndPoints: 0
-  move: 5
+  move: 18
   movements: {fileID: 1216357794}
-  initialTime: 10
-  timeScale: -1
+  initialTime: 0
+  timeScale: 1
   time: {fileID: 304227357}
-  height: 8
-  width: 6
+  height: 6
+  width: 7
   borderZise: 1
   tilePrefab: {fileID: 4258743434683497406, guid: bbf26dfb9b1c08f49b311a2bef9a4283, type: 3}
   gamePiecesPrefabas:
@@ -376,8 +377,6 @@ MonoBehaviour:
   - {fileID: 1555993521628639931, guid: b57ce12388aa8b14881519beb273fb27, type: 3}
   - {fileID: 6460779236137775174, guid: ab9aeeeaf7aaddd4ba511f8c21d63f3c, type: 3}
   - {fileID: 7192967199162171668, guid: 21c82d98e3b2d8d4397ce8e45bed064d, type: 3}
-  - {fileID: 6768869861359009125, guid: fab9436c8d4c00747be44f4756dbf0b2, type: 3}
-  - {fileID: 2544568178998053581, guid: 07757cec38acc5a4884bc0ec497dd131, type: 3}
   swapTime: 0.3
   color: {r: 1, g: 1, b: 1, a: 1}
   m_clickedTile: {fileID: 0}
@@ -1112,7 +1111,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -15.800007, y: -42.10001}
+  m_AnchoredPosition: {x: -15.800003, y: -42.100006}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1387238190

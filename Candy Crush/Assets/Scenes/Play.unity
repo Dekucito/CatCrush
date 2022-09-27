@@ -352,6 +352,7 @@ GameObject:
   - component: {fileID: 503611208}
   - component: {fileID: 503611207}
   - component: {fileID: 503611206}
+  - component: {fileID: 503611209}
   m_Layer: 5
   m_Name: Play
   m_TagString: Untagged
@@ -422,9 +423,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 800223831}
-        m_TargetAssemblyTypeName: SceneController, Assembly-CSharp
-        m_MethodName: Levels
+      - m_Target: {fileID: 503611209}
+        m_TargetAssemblyTypeName: Bottons, Assembly-CSharp
+        m_MethodName: CallScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -472,6 +473,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 503611204}
   m_CullTransparentMesh: 0
+--- !u!114 &503611209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 503611204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fce7865acee172349921d60a97fa394a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indexScene: 1
 --- !u!1 &725370692
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,7 +573,6 @@ GameObject:
   - component: {fileID: 800223834}
   - component: {fileID: 800223833}
   - component: {fileID: 800223832}
-  - component: {fileID: 800223831}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -567,18 +580,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &800223831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800223830}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 124f61cfbba45164aa02a1e3f9f5788f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &800223832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -874,6 +875,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 964464802}
   m_CullTransparentMesh: 0
+--- !u!1 &1261999065
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1261999067}
+  - component: {fileID: 1261999066}
+  m_Layer: 0
+  m_Name: SceneController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1261999066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261999065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 124f61cfbba45164aa02a1e3f9f5788f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1261999067
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261999065}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.0908897, y: -0.8967675, z: -770.2906}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1659229260
 GameObject:
   m_ObjectHideFlags: 0
@@ -886,6 +930,7 @@ GameObject:
   - component: {fileID: 1659229264}
   - component: {fileID: 1659229263}
   - component: {fileID: 1659229262}
+  - component: {fileID: 1659229265}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -956,9 +1001,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 800223831}
-        m_TargetAssemblyTypeName: SceneController, Assembly-CSharp
-        m_MethodName: ExitButton
+      - m_Target: {fileID: 1659229265}
+        m_TargetAssemblyTypeName: Bottons, Assembly-CSharp
+        m_MethodName: CallScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1006,6 +1051,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1659229260}
   m_CullTransparentMesh: 0
+--- !u!114 &1659229265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659229260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fce7865acee172349921d60a97fa394a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indexScene: 0
 --- !u!1 &1883864806
 GameObject:
   m_ObjectHideFlags: 0

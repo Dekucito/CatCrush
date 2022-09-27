@@ -5,33 +5,34 @@ using UnityEngine.SceneManagement;
 
 public class SceneController : MonoBehaviour
 {
-    public void ExitButton()
+    public static SceneController Instance;
+    public int lastScene;
+
+    private void Awake()
     {
-        SceneManager.LoadScene(2);
-        Time.timeScale = 1f;
-    }
-    public void PlayButton()
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }// inicializa variables antes del comienzo del juego y creaa una variable indestruible
+    public void LoadLevel(int lvlIndex)
     {
-        SceneManager.LoadScene(2);
-    }
-    public void Levels1()
+        SceneManager.LoadScene(lvlIndex);
+    }// conecta con board para cargar diferentes niveles
+    public void Corrutine()
     {
-        SceneManager.LoadScene(3);
-    }
-    public void Levels2()
+        StartCoroutine("SceneCorrutine");
+    } // inicia la corrutina SceneCorrutine
+    IEnumerator SceneCorrutine()
     {
-        SceneManager.LoadScene(4);
-    }
-    public void Levels3()
-    {
-        SceneManager.LoadScene(5);
-    }
-    public void Levels4()
-    {
-        SceneManager.LoadScene(6);
-    }
-    public void Levels5()
-    {
-        SceneManager.LoadScene(7);
-    }
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadScene(lastScene);
+    }// carga la escena anterior (cuando aparece la escecna de game over)
+
 }
